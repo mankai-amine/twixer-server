@@ -7,26 +7,27 @@ module.exports = {
 
     getPost: async(req, res) => {
         try {
-            const { id } = req.body;
+            const id = req.params;
             const existingPost = await Post.findOne({
                 where: {id: id},
             include: {model: User, attributes: ['username'] }
         });
-            res.status(201).send(existingPost);
+            res.status(201).json(existingPost);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" }); 
         }
     },
     addPost: async(req, res) => {
-        const { user_Id, content } = req.body;
+        const { user_id, content, orig_post_id } = req.body;
         try {
             // TODO validation here
-            await Post.create({
-                user_id: user_Id,
+            const createdPost = await Post.create({
+                user_id: user_id,
                 content: content,
+                orig_post_id: orig_post_id,
             });
-            res.status(201).send("Success");
+            res.status(201).json(createdPost);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" }); 

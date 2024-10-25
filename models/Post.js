@@ -40,6 +40,7 @@ Post.init(
 );
 
 Post.belongsTo(User, {foreignKey: 'user_id' });
-User.hasMany(Post, { foreignKey: 'user_id' });
+Post.hasMany(Like, {foreignKey: 'post_id' });
+Post.hasMany(Reply, {foreignKey: 'post_id'});
 
 module.exports = Post;
