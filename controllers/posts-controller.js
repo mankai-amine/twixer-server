@@ -7,9 +7,9 @@ module.exports = {
 
     getPost: async(req, res) => {
         try {
-            const postId = req.body.id;
+            const { id } = req.body;
             const existingPost = await Post.findOne({
-                where: {id: postId},
+                where: {id: id},
             include: {model: User, attributes: ['username'] }
         });
             res.status(201).send(existingPost);
@@ -19,11 +19,12 @@ module.exports = {
         }
     },
     addPost: async(req, res) => {
+        const { user_Id, content } = req.body;
         try {
             // TODO validation here
             await Post.create({
-                user_id: req.body.user_Id,
-                content: req.body.content,
+                user_id: user_Id,
+                content: content,
             });
             res.status(201).send("Success");
         } catch (error) {
