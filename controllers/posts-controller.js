@@ -12,7 +12,7 @@ module.exports = {
                 where: {id: postId},
             include: {model: User, attributes: ['username'] }
         });
-        res.status(201).send(existingPost);
+            res.status(201).send(existingPost);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" }); 
@@ -20,7 +20,12 @@ module.exports = {
     },
     addPost: async(req, res) => {
         try {
-
+            // TODO validation here
+            await Post.create({
+                user_id: req.body.user_Id,
+                content: req.body.content,
+            });
+            res.status(201).send("Success");
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" }); 
@@ -55,4 +60,23 @@ module.exports = {
     //         console.error(error);
     //         return res.status(500).json({error:" Internal server error"});
     //     }
+    // }
+
+    // async function isUserValid(email, password, req, res){
+
+    //     if(!validator.isEmail(email)){
+    //         res.status(400).send({
+    //             error: "Please provide a valid email"
+    //         })
+    //         return false;
+    //     }
+    
+    //     if(password.length > 50 || password.length < 6){
+    //         res.status(400).send({
+    //             error: "Password must contain between 6 and 50 characters"
+    //         })
+    //         return false;
+    //     }
+    
+    //     return true;
     // }
