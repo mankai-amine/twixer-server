@@ -2,9 +2,9 @@ const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/database');
 const User = require('./User');
 
-class Posts extends Model {}
+class Post extends Model {}
 
-Posts.init(
+Post.init(
     {
         id: {
             type: DataTypes.INTEGER,
@@ -32,9 +32,14 @@ Posts.init(
             type: DataTypes.INTEGER,
             allowNull: true,
             references: {
-                model: Posts,
+                model: Post,
                 key: 'id',
             },
         }
     }
 );
+
+Post.belongsTo(User, {foreignKey: 'user_id' });
+User.hasMany(Post, { foreignKey: 'user_id' });
+
+module.exports = Post;
