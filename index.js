@@ -1,20 +1,50 @@
-const express = require("express");
-const cors = require('cors');
-const sequelize = require('./config/database');
-const postRoutes = require('./routes/posts-routes');
+require('dotenv').config();
 
+const express = require("express");
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+const cors = require('cors');  
+app.use(cors());  
 app.use(express.json());
 
-app.use('/api/posts', postRoutes);
+// Initialize Sequelize with environment variables
+const { Sequelize } = require('sequelize');
 
-app.listen(3001, () => {
-    console.log("Server running on port 3001");
+const sequelize = new Sequelize(
+  process.env.DB_DATABASE,
+  process.env.DB_USERNAME,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: 'mysql',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    }
+  }
+);
+
+// Load models
+//const db = require('./models'); 
+
+// Routes
+//const userRouter = require('./routes/Users');
+//app.use("/api/users", userRouter);
+
+// Start the server
+const PORT = process.env.PORT;  
+app.listen(PORT, () => {
+  console.log("Server running on port 13106");
 });
 
-sequelize.sync()
-    .then(() => {
-        console.log('Database & tables created');
-    });
+// Test the connection
+sequelize.authenticate()
+  .then(() => {
+    console.log('Database connection established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
