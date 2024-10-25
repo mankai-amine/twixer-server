@@ -12,6 +12,7 @@ module.exports = {
                 where: {id: id},
             include: {model: User, attributes: ['username'] }
         });
+        // TODO validation for post not existing
             res.status(201).json(existingPost);
         } catch (error) {
             console.error(error);
@@ -19,14 +20,10 @@ module.exports = {
         }
     },
     addPost: async(req, res) => {
-        const { user_id, content, orig_post_id } = req.body;
         try {
+            const post = req.body;
             // TODO validation here
-            const createdPost = await Post.create({
-                user_id: user_id,
-                content: content,
-                orig_post_id: orig_post_id,
-            });
+            const createdPost = await Post.create(post);
             res.status(201).json(createdPost);
         } catch (error) {
             console.error(error);
