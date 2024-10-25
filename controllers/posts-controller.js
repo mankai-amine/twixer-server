@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, Post } = require("../models");
 // const validator = require('validator');
 // const bcrypt = require('bcrypt');
 // const {sign} = require("jsonwebtoken")
