@@ -1,0 +1,25 @@
+2024/10/25 Sean
+1. Done since last scrum
+- First scrum
+2. Plan until next Scrum
+- Work on server side model and logic for posts
+3. Need assistance / figure things out
+- 
+
+2024/10/25 Amine
+1. Done since last scrum
+- First scrum
+2. Plan until next Scrum
+- Work on server side model and logic for users
+3. Need assistance / figure things out
+- 
+
+2024/10/25 Michael
+1. Done since last scrum
+- First scrum
+2. Plan until next Scrum
+- Work on base design of views for Client
+3. Need assistance / figure things out
+- 
+
+*****
