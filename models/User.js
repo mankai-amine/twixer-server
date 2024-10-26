@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
             unique: true
         },
         username:{
-            type: DataTypes.STRING(500),
+            type: DataTypes.STRING(50),
             allowNull: false,
             unique: true
         },
@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         bio:{
             type: DataTypes.STRING(160),
-            allowNull: false,
+            allowNull: true,
         },
         creation_date:{
             type: DataTypes.DATE,
@@ -35,7 +35,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         account_status:{
             type: DataTypes.ENUM('active', 'unverified', 'banned'),
-            allowNull: true
+            defaultValue: 'active',
+            allowNull: false
         },
         profile_pic:{
             type: DataTypes.TEXT,
