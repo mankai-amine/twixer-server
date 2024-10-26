@@ -28,7 +28,7 @@ module.exports = {
             res.status(500).json({error:" Internal server error"});
         }
     },
-    addUser: async(req, res) => {
+    register: async(req, res) => {
         try{
             const user = req.body;
 
@@ -69,6 +69,11 @@ module.exports = {
                 return res.status(404).json({ error: "User doesn't exist" }); // 404 Not Found
             } 
 
+            if(user.status == "banned"){
+                return res.status(400).json({ error: "You have been banned" }); 
+
+            }
+
             const match = await bcrypt.compare(password, user.password);
 
             if (!match) {
@@ -83,6 +88,64 @@ module.exports = {
         } catch (error){
             console.error(error);
             return res.status(500).json({error:" Internal server error"}); // 500 Internal Server Error
+        }
+    },
+    updateById: async(req, res) => {
+        const userDetails = req.body;
+        const { id } = req.params;
+        const authUser = req.user;
+
+        try{
+            if(parseInt(authUser.id, 10) !== parseInt(id, 10)){
+                return res.status(400).json({message:"Request not authorized"});
+            }
+
+            const requestedUser = await User.findByPk(id);
+            if(requestedUser === null){
+                return res.status(400).json({message:"User not found"});
+            }
+
+            if(!isUserValid(userDetails, req, res)){
+                return;
+            }
+
+            if(userDetails.password){
+                userDetails.password = await bcrypt.hash(userDetails.password, 10);
+            }
+
+            const updatedUser = await requestedUser.update({
+                ...userDetails,
+                // If no new password is provided, keep the existing one
+                password: userDetails.password || requestedUser.password,
+            });
+    
+            res.status(200).json(updatedUser);
+        } catch (error){
+            console.error(error);
+            res.status(500).json({message:" Internal server error"});
+        }
+    },
+    banById: async(req, res) => {
+        try{
+            const currUser = req.user;
+            if(currUser.role !== "ADMIN"){
+                return res.status(403).json({message:"Request only possible for admins"});
+            }
+
+            const { bannedUserId } = req.params;
+
+            const bannedUser = await User.findByPk(bannedUserId);
+            if(bannedUser === null){
+                return res.status(404).json({message:"User not found"});
+            }
+
+            bannedUser.status = "banned";
+            await bannedUser.save(); 
+
+            res.status(200).json(bannedUser);
+        } catch (error){
+            console.error(error);
+            res.status(500).json({message:" Internal server error"});
         }
     }
 }
