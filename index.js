@@ -34,6 +34,10 @@ const sequelize = new Sequelize(
 //const userRouter = require('./routes/Users');
 //app.use("/api/users", userRouter);
 
+//const followRouter = require('./routes/Follows');
+//app.use("/api/follows", followRouter);
+
+
 // Start the server
 const PORT = process.env.PORT;  
 app.listen(PORT, () => {
