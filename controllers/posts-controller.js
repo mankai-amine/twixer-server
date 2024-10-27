@@ -1,22 +1,44 @@
-const { User, Post } = require("../models");
+const { User, Post, Like, Reply } = require("../models");
 // const validator = require('validator');
-// const bcrypt = require('bcrypt');
-// const {sign} = require("jsonwebtoken")
 
 module.exports = {
 
     getPost: async(req, res) => {
-        const id = req.params;
+        const { id } = req.params;
 
         try {
             const existingPost = await Post.findOne({
                 where: {id: id},
-            include: {model: User, attributes: ['username'] }
-        });
+                attributes: {
+                    include: [
+                        [
+                            sequelize.fn('COUNT', sequelize.col('Likes.id')),
+                            'likeCount'
+                        ]
+                    ]
+                },
+                include: [
+                    {
+                        model: User,
+                        attributes: ['username']
+                    },
+                    {
+                        model: Like,
+                        attributes: [],
+                    },
+                    {
+                        model: Reply,
+                        attributes: ['content']
+                    }
+                    // might need additional logic on reply later for nested replies.
+                    // might also add more includes for things like reposting
+                ],
+                group: ['Post.id', 'User.id']
+            });
             if (existingPost === null) {
                 return res.status(400).json({ message: "Post does not exist"});
             }
-            res.status(201).json(existingPost);
+            return res.status(201).json(existingPost);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" }); 
@@ -31,7 +53,7 @@ module.exports = {
                 return;
             }
             const createdPost = await Post.create(post);
-            res.status(201).json(createdPost);
+            return res.status(201).json(createdPost);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" }); 
@@ -59,7 +81,7 @@ module.exports = {
                 content: content
             });
 
-            res.status(200).json(editedPost);
+            return res.status(200).json(editedPost);
         } catch (error) {
             console.error(error);
             res.status(500).json({message:" Internal server error"});
@@ -83,7 +105,7 @@ module.exports = {
             requestedPost.is_deleted = true;
             requestedPost.save();
 
-            res.status(200).json(requestedPost);
+            return res.status(200).json(requestedPost);
         } catch (error) {
             console.error(error);
             res.status(500).json({message:" Internal server error"});
