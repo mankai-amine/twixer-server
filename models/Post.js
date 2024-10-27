@@ -28,6 +28,11 @@ Post.init(
             type: DataTypes.STRING(560),
             allowNull: false,
         },
+        is_deleted: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+        },
         orig_post_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
