@@ -9,7 +9,7 @@ module.exports = {
         const userId = req.body.followeeId;
 
         try{
-            const listOfFollowers = await Todo.findAll({
+            const listOfFollowers = await Follow.findAll({
                 where: {
                     followee_id: userId 
                 }
