@@ -23,3 +23,31 @@
 - 
 
 *****
+2024/10/27 Sean
+1. Done since last scrum
+- Work on Posts backend(get, add, update, delete), Post Model
+2. Plan until next Scrum
+- Get feed working for posts(general and follower feed)
+- Work on replies backend(model, routes)
+3. Need assistance / figure things out
+- 
+
+2024/10/27 Amine
+1. Done since last scrum
+- Work on users backend (routes, models, controller)
+2. Plan until next Scrum
+- Get a users's profile page
+- Work on follows
+3. Need assistance / figure things out
+- Include the number of replies, likes and reposts of each post in the profile page
+
+2024/10/27 Michael
+1. Done since last scrum
+- Setup login and register pages
+2. Plan until next Scrum
+- Finish edits to PR based on feedback
+- Front end routing for feed, feed page
+3. Need assistance / figure things out
+- 
+
+*****
