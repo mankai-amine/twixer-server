@@ -38,7 +38,7 @@ module.exports = {
                     }
                     // might need additional logic on reply later for nested replies.
                     // might also add more includes for things like reposting
-                ]
+                ],
             });
             if (existingPost === null) {
                 return res.status(400).json({ message: "Post does not exist"});
