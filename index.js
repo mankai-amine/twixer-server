@@ -37,6 +37,9 @@ const sequelize = new Sequelize(
 //const followRouter = require('./routes/Follows');
 //app.use("/api/follows", followRouter);
 
+//const likeRouter = require('./routes/Likes');
+//app.use("/api/likes", likeRouter);
+
 
 // Start the server
 const PORT = process.env.PORT;  
