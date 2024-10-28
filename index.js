@@ -40,6 +40,8 @@ const sequelize = new Sequelize(
 //const likeRouter = require('./routes/Likes');
 //app.use("/api/likes", likeRouter);
 
+//const uploadRouter = require('./routes/Uploads');
+//app.use("/api/uploads", uploadRouter);
 
 // Start the server
 const PORT = process.env.PORT;  
