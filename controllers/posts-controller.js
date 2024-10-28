@@ -28,12 +28,17 @@ module.exports = {
                     },
                     {
                         model: Reply,
-                        attributes: ['content']
+                        attributes: ['content'],
+                        include: [
+                            {
+                                model: User,
+                                attributes: ['username']
+                            }
+                        ]
                     }
                     // might need additional logic on reply later for nested replies.
                     // might also add more includes for things like reposting
-                ],
-                group: ['Post.id', 'User.id']
+                ]
             });
             if (existingPost === null) {
                 return res.status(400).json({ message: "Post does not exist"});
@@ -113,7 +118,7 @@ module.exports = {
     },
     getUserPosts: async(req, res) => {
         const { username } = req.params;
-
+        // TODO
         try {
 
         } catch (error) {
