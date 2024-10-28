@@ -8,27 +8,27 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize Sequelize with environment variables
-const { Sequelize } = require('sequelize');
+// const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize(
-  process.env.DB_DATABASE,
-  process.env.DB_USERNAME,
-  process.env.DB_PASSWORD,
-  {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    dialect: 'mysql',
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      }
-    }
-  }
-);
+// const sequelize = new Sequelize(
+//   process.env.DB_DATABASE,
+//   process.env.DB_USERNAME,
+//   process.env.DB_PASSWORD,
+//   {
+//     host: process.env.DB_HOST,
+//     port: process.env.DB_PORT,
+//     dialect: 'mysql',
+//     dialectOptions: {
+//       ssl: {
+//         require: true,
+//         rejectUnauthorized: false
+//       }
+//     }
+//   }
+// );
 
 // Load models
-//const db = require('./models'); 
+const db = require('./models');
 
 // Routes
 //const userRouter = require('./routes/Users');
@@ -44,13 +44,13 @@ const sequelize = new Sequelize(
 // Start the server
 const PORT = process.env.PORT;  
 app.listen(PORT, () => {
-  console.log("Server running on port 13106");
+  console.log(`Server running on port ${PORT}`);
 });
 
 // Test the connection
-sequelize.authenticate()
+db.sequelize.sync()
   .then(() => {
-    console.log('Database connection established successfully.');
+    console.log('Database connection and sync established successfully.');
   })
   .catch(err => {
     console.error('Unable to connect to the database:', err);

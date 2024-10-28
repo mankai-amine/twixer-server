@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define("User", {
+    const Like = sequelize.define("Like", {
         id:{
             type: DataTypes.INTEGER,
             autoIncrement: true,
@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true,
             references: {
-                model: Post,
+                model: 'posts',
                 key: 'id',
             },
         },
@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true,
             references: {
-                model: Reply,
+                model: 'replies',
                 key: 'id',
             },
         },
@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: User,
+                model: 'users',
                 key: 'id',
             },
         }
@@ -55,5 +55,5 @@ module.exports = (sequelize, DataTypes) => {
         });
     };
 
-    return User;
+    return Like;
 }
