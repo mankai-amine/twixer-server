@@ -110,6 +110,15 @@ module.exports = {
             console.error(error);
             res.status(500).json({message:" Internal server error"});
         }
+    },
+    getUserPosts: async(req, res) => {
+        const { username } = req.params;
+
+        try {
+
+        } catch (error) {
+            
+        }
     }
 
 }
