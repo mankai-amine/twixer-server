@@ -9,10 +9,17 @@ module.exports = {
         const userId = req.body.followeeId;
 
         try{
-            const listOfFollowers = await Todo.findAll({
+            const listOfFollowers = await Follow.findAll({
                 where: {
                     followee_id: userId 
-                }
+                },
+                include: [
+                    {
+                        model: User, 
+                        as: 'follower', 
+                        attributes: [ 'username']
+                    }
+                ]
             });
             res.status(200).json(listOfFollowers);
         } catch (error){
@@ -24,6 +31,17 @@ module.exports = {
         try{
             const followerId = req.user.id;
             const followeeId = req.body.followeeId;
+
+            const follow = await Follow.findOne({
+                where: {
+                    follower_id : followerId,
+                    followee_id: followeeId, 
+                }
+            })
+
+            if(follow){
+                return res.status(400).json({error:"The follow relation already exists"});
+            }
 
             await Follow.create({
                 follower_id : followerId,
