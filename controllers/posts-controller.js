@@ -1,4 +1,5 @@
-const { User, Post, Like, Reply } = require("../models");
+const { Op } = require("sequelize");
+const { User, Post, Like, Reply, Follow, sequelize } = require("../models");
 // const validator = require('validator');
 
 module.exports = {
@@ -38,7 +39,7 @@ module.exports = {
                     }
                     // might need additional logic on reply later for nested replies.
                     // might also add more includes for things like reposting
-                ],
+                ]
             });
             if (existingPost === null) {
                 return res.status(400).json({ message: "Post does not exist"});
@@ -118,17 +119,138 @@ module.exports = {
     },
     getUserPosts: async(req, res) => {
         const { username } = req.params;
-        const currUser = req.user;
 
         try {
             const existingUser = await User.findOne({
-                where: {username: currUser.username}
+                where: {username: username}
             });
             if (existingUser === null) {
                 return res.status(400).json({message:"User not found"});
             }
+            const allPostsByUser = await Post.findAll({
+                where: {user_id: existingUser.id}
+            });
+            if (allPostsByUser === null) {
+                return res.status(200).json({message:"There are no posts by this user"});
+            }
 
-            
+            return res.status(200).json(allPostsByUser);     
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({message:" Internal server error"});
+        }
+    },
+    getGeneralFeed: async(req, res) => {
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+        try {
+            const generalPosts = await Post.findAll({
+                where: {
+                    date: {
+                        [Op.gte]: threeDaysAgo
+                    }
+                },
+                attributes: {
+                    include: [
+                        [
+                            sequelize.fn('COUNT', sequelize.col('Likes.id')),
+                            'likeCount'
+                        ]
+                    ]
+                },
+                include: [
+                    {
+                        model: User,
+                        attributes: ['username']
+                    },
+                    {
+                        model: Like,
+                        attributes: [],
+                    },
+                    {
+                        // might need to limit replies displayed for feed
+                        model: Reply,
+                        attributes: ['content'],
+                        include: [
+                            {
+                                modlel: User,
+                                attributes: ['username']
+                            }
+                        ]
+                    }
+                ],
+                group: ['Post.id', 'User.id']
+            });
+            if (generalPosts === null) {
+                return res.status(200).json({message:"There are no recent posts"});
+            }
+
+            return res.status(200).json(generalPosts);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({message:" Internal server error"});
+        }
+    },
+    getFollowFeed: async(req, res) => {
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        const currUserId = req.user.id;
+
+        try {
+            const userFolloweeIds = await Follow.findAll({
+                attributes: ['followee_id'],
+                where: {follower_id: currUserId},
+            });
+            if (userFolloweeIds === null) {
+                return res.status(200).json({message:"User is not following anyone"});
+            }
+
+            const postsByFollowees = await Post.findAll({
+                where: {
+                    user_id: {
+                        [Op.in]: userFolloweeIds
+                    },
+                    date: {
+                        [Op.gte]: threeDaysAgo
+                    }
+                },
+                attributes: {
+                    include: [
+                        [
+                            sequelize.fn('COUNT', sequelize.col('Likes.id')),
+                            'likeCount'
+                        ]
+                    ]
+                },
+                include: [
+                    {
+                        model: User,
+                        attributes: ['username']
+                    },
+                    {
+                        model: Like,
+                        attributes: [],
+                    },
+                    {
+                        // might need to limit replies displayed for feed
+                        model: Reply,
+                        attributes: ['content'],
+                        include: [
+                            {
+                                modlel: User,
+                                attributes: ['username']
+                            }
+                        ]
+                    }
+                ],
+                group: ['Post.id', 'User.id']
+            });
+            if (postsByFollowees === null) {
+                return res.status(200).json({message:"Followees do not have any recent posts"});
+            }
+
+            return res.status(200).json(postsByFollowees);
         } catch (error) {
             console.error(error);
             res.status(500).json({message:" Internal server error"});
@@ -137,6 +259,7 @@ module.exports = {
 
 }
 
+    // helper function
     async function isPostValid(content, currUser, req, res){
         const pattern1 = /^[a-zA-Z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/;
     
