@@ -199,19 +199,19 @@ async function isUserValid(user, req, res){
         return false;
     }
 
-    if(user.bio.length > 160 || user.bio.length < 10){
-        res.status(400).send({
-            error: "Bio must contain between 10 and 160 characters"
-        })
-        return false;
-    }
+    // if(user.bio.length > 160 || user.bio.length < 10){
+    //     res.status(400).send({
+    //         error: "Bio must contain between 10 and 160 characters"
+    //     })
+    //     return false;
+    // }
 
-    if(!pattern2.test(user.bio)){
-        res.status(400).send({
-            message: "Bio must contain only alphanumeric characters and general symbols"
-        })
-        return false;
-    }
+    // if(!pattern2.test(user.bio)){
+    //     res.status(400).send({
+    //         message: "Bio must contain only alphanumeric characters and general symbols"
+    //     })
+    //     return false;
+    // }
 
     return true;
 }
