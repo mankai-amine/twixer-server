@@ -1,5 +1,5 @@
-const { User, Post, Like, Reply } = require("../models");
-// const validator = require('validator');
+const { Op } = require("sequelize");
+const { User, Post, Like, Reply, Follow, sequelize } = require("../models");
 
 module.exports = {
 
@@ -38,7 +38,7 @@ module.exports = {
                     }
                     // might need additional logic on reply later for nested replies.
                     // might also add more includes for things like reposting
-                ],
+                ]
             });
             if (existingPost === null) {
                 return res.status(400).json({ message: "Post does not exist"});
@@ -46,7 +46,7 @@ module.exports = {
             return res.status(201).json(existingPost);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Internal server error" }); 
+            res.status(500).json({ message: "Internal server error" });
         }
     },
     addPost: async(req, res) => {
@@ -57,8 +57,12 @@ module.exports = {
             if (!isPostValid(content, currUser, req, res)) {
                 return;
             }
-            const createdPost = await Post.create(post);
+            const createdPost = await Post.create({
+                user_id: currUser.id,
+                content: content,
+            });
             return res.status(201).json(createdPost);
+
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" }); 
@@ -70,23 +74,24 @@ module.exports = {
         const { id } = req.params;
 
         try {
-            if(parseInt(currUser.id, 10) !== parseInt(id, 10)){
-                return res.status(400).json({message:"Request not authorized"});
-            }
-
             const requestedPost = await Post.findByPk(id);
             if (requestedPost === null) {
                 return res.status(400).json({message:"Post not found"});
             }
 
+            if(parseInt(currUser.id, 10) !== parseInt(requestedPost.user_id, 10)){
+                return res.status(400).json({message:"Request not authorized"});
+            }
+
             if (!isPostEditable(content, currUser, req, res)) {
                 return;
             }
+
             const editedPost = await Post.update({
                 content: content
             });
-
             return res.status(200).json(editedPost);
+
         } catch (error) {
             console.error(error);
             res.status(500).json({message:" Internal server error"});
@@ -97,13 +102,13 @@ module.exports = {
         const { id } = req.params;
 
         try {
-            if(parseInt(currUser.id, 10) !== parseInt(id, 10)){
-                return res.status(400).json({message:"Request not authorized"});
-            }
-
             const requestedPost = await Post.findByPk(id);
             if (requestedPost === null) {
                 return res.status(400).json({message:"Post not found"});
+            }
+
+            if(parseInt(currUser.id, 10) !== parseInt(requestedPost.user_id, 10)){
+                return res.status(400).json({message:"Request not authorized"});
             }
 
             requestedPost.content = "This post was deleted";
@@ -118,30 +123,161 @@ module.exports = {
     },
     getUserPosts: async(req, res) => {
         const { username } = req.params;
-        // TODO
-        try {
 
+        try {
+            const existingUser = await User.findOne({
+                where: {username: username}
+            });
+            if (existingUser === null) {
+                return res.status(400).json({message:"User not found"});
+            }
+            const allPostsByUser = await Post.findAll({
+                where: {user_id: existingUser.id}
+            });
+            if (allPostsByUser === null) {
+                return res.status(200).json({message:"There are no posts by this user"});
+            }
+
+            return res.status(200).json(allPostsByUser);     
         } catch (error) {
-            
+            console.error(error);
+            res.status(500).json({message:" Internal server error"});
+        }
+    },
+    getGeneralFeed: async(req, res) => {
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+        try {
+            const generalPosts = await Post.findAll({
+                where: {
+                    date: {
+                        [Op.gte]: threeDaysAgo
+                    }
+                },
+                attributes: {
+                    include: [
+                        [
+                            sequelize.fn('COUNT', sequelize.col('Likes.id')),
+                            'likeCount'
+                        ]
+                    ]
+                },
+                include: [
+                    {
+                        model: User,
+                        attributes: ['username']
+                    },
+                    {
+                        model: Like,
+                        attributes: [],
+                    },
+                    {
+                        // might need to limit replies displayed for feed
+                        model: Reply,
+                        attributes: ['content'],
+                        include: [
+                            {
+                                modlel: User,
+                                attributes: ['username']
+                            }
+                        ]
+                    }
+                ],
+                group: ['Post.id', 'User.id']
+            });
+            if (generalPosts === null) {
+                return res.status(200).json({message:"There are no recent posts"});
+            }
+
+            return res.status(200).json(generalPosts);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({message:" Internal server error"});
+        }
+    },
+    getFollowFeed: async(req, res) => {
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        const currUserId = req.user.id;
+
+        try {
+            const userFolloweeIds = await Follow.findAll({
+                attributes: ['followee_id'],
+                where: {follower_id: currUserId},
+            });
+            if (userFolloweeIds === null) {
+                return res.status(200).json({message:"User is not following anyone"});
+            }
+
+            const postsByFollowees = await Post.findAll({
+                where: {
+                    user_id: {
+                        [Op.in]: userFolloweeIds
+                    },
+                    date: {
+                        [Op.gte]: threeDaysAgo
+                    }
+                },
+                attributes: {
+                    include: [
+                        [
+                            sequelize.fn('COUNT', sequelize.col('Likes.id')),
+                            'likeCount'
+                        ]
+                    ]
+                },
+                include: [
+                    {
+                        model: User,
+                        attributes: ['username']
+                    },
+                    {
+                        model: Like,
+                        attributes: [],
+                    },
+                    {
+                        // might need to limit replies displayed for feed
+                        model: Reply,
+                        attributes: ['content'],
+                        include: [
+                            {
+                                modlel: User,
+                                attributes: ['username']
+                            }
+                        ]
+                    }
+                ],
+                group: ['Post.id', 'User.id']
+            });
+            if (postsByFollowees === null) {
+                return res.status(200).json({message:"Followees do not have any recent posts"});
+            }
+
+            return res.status(200).json(postsByFollowees);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({message:" Internal server error"});
         }
     }
 
 }
 
+    // helper function
     async function isPostValid(content, currUser, req, res){
         const pattern1 = /^[a-zA-Z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/;
     
         if (currUser.role !== "PREMIUM") {
-            if(content.length > 280 || content.length < 5){
+            if(content.length > 280 || content.length < 10){
                 res.status(400).send({
-                    error: "Post must contain between 5 and 280 characters. Upgrade to Premium for a higher character count."
+                    error: "Post must contain between 10 and 280 characters. Upgrade to Premium for a higher character count."
                 })
                 return false;
             }
         } else {
-            if(content.length > 560 || content.length < 5){
+            if(content.length > 560 || content.length < 10){
                 res.status(400).send({
-                    error: "Post must contain between 5 and 560 characters"
+                    error: "Post must contain between 10 and 560 characters"
                 })
                 return false;
             }
@@ -169,7 +305,7 @@ module.exports = {
 
         if(content.length > 560 || content.length < 5){
             res.status(400).send({
-                error: "Post must contain between 5 and 560 characters"
+                error: "Post must contain between 10 and 560 characters"
             })
             return false;
         }

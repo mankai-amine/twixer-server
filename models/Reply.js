@@ -1,9 +1,22 @@
 module.exports = (sequelize, DataTypes) => {
-    const Post = sequelize.define("Post", {
+    const Reply = sequelize.define("Reply", {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
+        },
+        post_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'posts',
+                key: 'id',
+            },
+        },
+        date: {
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW,
+            allowNull: false,
         },
         user_id: {
             type: DataTypes.INTEGER,
@@ -13,13 +26,8 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id',
             },
         },
-        date: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
-            allowNull: false,
-        },
         content: {
-            type: DataTypes.STRING(560),
+            type: DataTypes.STRING(280),
             allowNull: false,
         },
         is_deleted: {
@@ -27,35 +35,35 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: false,
         },
-        orig_post_id: {
+        orig_reply_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
             references: {
-                model: 'posts',
+                model: 'replies',
                 key: 'id',
             },
         }
     }, {
-        tableName: 'posts',
+        tableName: 'replies',
         timestamps: false,
     });
 
-    Post.associate = (models) => {
-        Post.belongsTo(models.User, {
+    Reply.associate = (models) => {
+        Reply.belongsTo(models.User, {
             foreignKey: 'user_id',
-            as: 'poster'
+            as: 'replier'
         });
 
-        Post.hasMany(models.Reply, {
+        Reply.belongsTo(models.Post, {
             foreignKey: 'post_id',
-            as: 'replies'
+            as: 'post'
         });
-
-        Post.hasMany(models.Like, {
-            foreignKey: 'post_id',
+        
+        Reply.hasMany(models.Like, {
+            foreignKey: 'reply_id',
             as: 'likes'
         });
     };
 
-    return Post;
+    return Reply;
 }
