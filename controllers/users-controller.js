@@ -109,14 +109,24 @@ module.exports = {
                 return;
             }
 
-            if(userDetails.password){
-                userDetails.password = await bcrypt.hash(userDetails.password, 10);
+            const existingUsername = await User.findOne({ where: { username: userDetails.username } }); 
+            if (existingUsername) {
+                return res.status(400).json({ error: "Username already exists" });
             }
+
+            const existingEmail = await User.findOne({ where: { email: userDetails.email } }); 
+            if (existingEmail) {
+                return res.status(400).json({ error: "Email already exists" });
+            }
+
+            /*if(userDetails.password){
+                userDetails.password = await bcrypt.hash(userDetails.password, 10);
+            }*/
 
             const updatedUser = await requestedUser.update({
                 ...userDetails,
                 // If no new password is provided, keep the existing one
-                password: userDetails.password || requestedUser.password,
+                //password: userDetails.password || requestedUser.password,
             });
     
             res.status(200).json(updatedUser);
