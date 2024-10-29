@@ -1,6 +1,5 @@
 const { Op } = require("sequelize");
 const { User, Post, Like, Reply, Follow, sequelize } = require("../models");
-// const validator = require('validator');
 
 module.exports = {
 
@@ -47,7 +46,7 @@ module.exports = {
             return res.status(201).json(existingPost);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Internal server error" }); 
+            res.status(500).json({ message: "Internal server error" });
         }
     },
     addPost: async(req, res) => {
@@ -58,8 +57,12 @@ module.exports = {
             if (!isPostValid(content, currUser, req, res)) {
                 return;
             }
-            const createdPost = await Post.create(post);
+            const createdPost = await Post.create({
+                user_id: currUser.id,
+                content: content,
+            });
             return res.status(201).json(createdPost);
+
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" }); 
@@ -71,23 +74,24 @@ module.exports = {
         const { id } = req.params;
 
         try {
-            if(parseInt(currUser.id, 10) !== parseInt(id, 10)){
-                return res.status(400).json({message:"Request not authorized"});
-            }
-
             const requestedPost = await Post.findByPk(id);
             if (requestedPost === null) {
                 return res.status(400).json({message:"Post not found"});
             }
 
+            if(parseInt(currUser.id, 10) !== parseInt(requestedPost.user_id, 10)){
+                return res.status(400).json({message:"Request not authorized"});
+            }
+
             if (!isPostEditable(content, currUser, req, res)) {
                 return;
             }
+
             const editedPost = await Post.update({
                 content: content
             });
-
             return res.status(200).json(editedPost);
+
         } catch (error) {
             console.error(error);
             res.status(500).json({message:" Internal server error"});
@@ -98,13 +102,13 @@ module.exports = {
         const { id } = req.params;
 
         try {
-            if(parseInt(currUser.id, 10) !== parseInt(id, 10)){
-                return res.status(400).json({message:"Request not authorized"});
-            }
-
             const requestedPost = await Post.findByPk(id);
             if (requestedPost === null) {
                 return res.status(400).json({message:"Post not found"});
+            }
+
+            if(parseInt(currUser.id, 10) !== parseInt(requestedPost.user_id, 10)){
+                return res.status(400).json({message:"Request not authorized"});
             }
 
             requestedPost.content = "This post was deleted";
@@ -264,16 +268,16 @@ module.exports = {
         const pattern1 = /^[a-zA-Z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/;
     
         if (currUser.role !== "PREMIUM") {
-            if(content.length > 280 || content.length < 5){
+            if(content.length > 280 || content.length < 10){
                 res.status(400).send({
-                    error: "Post must contain between 5 and 280 characters. Upgrade to Premium for a higher character count."
+                    error: "Post must contain between 10 and 280 characters. Upgrade to Premium for a higher character count."
                 })
                 return false;
             }
         } else {
-            if(content.length > 560 || content.length < 5){
+            if(content.length > 560 || content.length < 10){
                 res.status(400).send({
-                    error: "Post must contain between 5 and 560 characters"
+                    error: "Post must contain between 10 and 560 characters"
                 })
                 return false;
             }
@@ -301,7 +305,7 @@ module.exports = {
 
         if(content.length > 560 || content.length < 5){
             res.status(400).send({
-                error: "Post must contain between 5 and 560 characters"
+                error: "Post must contain between 10 and 560 characters"
             })
             return false;
         }

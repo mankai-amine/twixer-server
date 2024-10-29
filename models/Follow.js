@@ -23,7 +23,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         
     }, {
-        tableName: 'follows'  
+        tableName: 'follows',
+        timestamps: false,
     });
 
     Follow.associate = (models) => {

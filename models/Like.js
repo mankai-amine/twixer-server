@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         
     }, {
         tableName: 'likes',
+        timestamps: false,
         validate: {
             onlyOneReference() {
                 if ((this.post_id === null && this.reply_id === null) || (this.post_id !== null && this.reply_id !== null)) {
