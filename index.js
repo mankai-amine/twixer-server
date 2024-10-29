@@ -23,8 +23,8 @@ app.use("/api/likes", likeRouter);
 const postRouter = require('./routes/Posts');
 app.use("/api/posts", postRouter);
 
-// const replyRouter = require('./routes/Replies');
-// app.use("/api/replies", replyRouter);
+const replyRouter = require('./routes/Replies');
+app.use("/api/replies", replyRouter);
 
 // Start the server
 const PORT = process.env.PORT;  
