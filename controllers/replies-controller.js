@@ -40,13 +40,23 @@ module.exports = {
     },
     updateReply: async(req, res) => {
         const currUser = req.user;
-        const { postId } = req.params;
+        const { id } = req.params;
         const { content } = req.body;
 
         try {
+            const requestedReply = await Reply.findByPk(id);
+            if (requestedReply === null) {
+                return res.status(400).json({message:"Reply not found"});
+            }
+
+            if(parseInt(currUser.id, 10) !== parseInt(requestedReply.user_id, 10)){
+                return res.status(400).json({message:"Request not authorized"});
+            }
+
             if (!isReplyEditable(content, currUser, req, res)) {
                 return;
             }
+
             const editedReply = await Reply.update({
                 content: content
             });
