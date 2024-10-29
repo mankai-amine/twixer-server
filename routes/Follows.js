@@ -5,7 +5,7 @@ const { validateToken } = require("../middlewares/AuthMiddleware");
 
 
 
-router.get("/:followeeId", controller.getFollows);
+router.get("/:followeeId", controller.getFollowers);
 router.post("/:followeeId", validateToken, controller.follow);
 router.delete("/:followeeId", validateToken, controller.unfollow);
 
