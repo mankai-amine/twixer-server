@@ -51,3 +51,31 @@
 - 
 
 *****
+2024/10/28 Sean
+1. Done since last scrum
+- Work on Posts backend(delete, getUserPosts)
+2. Plan until next Scrum
+- Finish off NodeJS API endpoints
+3. Need assistance / figure things out
+- Heroku eventually
+
+2024/10/28 Amine
+1. Done since last scrum
+- Work on follows and likes backend 
+2. Plan until next Scrum
+- Work on upload backend
+- Work on user profile frontend
+3. Need assistance / figure things out
+- 
+
+2024/10/28 Michael
+1. Done since last scrum
+- Finished working on comments from PR request
+2. Plan until next Scrum
+- Work on feed view
+- Start testing database via POSTMAN
+3. Need assistance / figure things out
+- CSS for logo on register and login
+- review react-hook-form
+
+*****
