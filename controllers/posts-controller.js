@@ -4,15 +4,15 @@ const { User, Post, Like, Reply, Follow, sequelize } = require("../models");
 module.exports = {
 
     getPost: async(req, res) => {
-        const { id } = req.params;
+        const { postId } = req.params;
 
         try {
             const existingPost = await Post.findOne({
-                where: {id: id},
+                where: {id: postId},
                 attributes: {
                     include: [
                         [
-                            sequelize.fn('COUNT', sequelize.col('Likes.id')),
+                            sequelize.fn('COUNT', sequelize.col('likes.id')),
                             'likeCount'
                         ]
                     ]
@@ -20,30 +20,35 @@ module.exports = {
                 include: [
                     {
                         model: User,
+                        as: 'poster',
                         attributes: ['username']
                     },
                     {
                         model: Like,
+                        as: 'likes',
                         attributes: [],
                     },
                     {
                         model: Reply,
+                        as: 'replies',
                         attributes: ['content'],
                         include: [
                             {
                                 model: User,
+                                as: 'replier',
                                 attributes: ['username']
                             }
                         ]
                     }
                     // might need additional logic on reply later for nested replies.
                     // might also add more includes for things like reposting
-                ]
+                ],
+                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id']
             });
             if (existingPost === null) {
                 return res.status(400).json({ message: "Post does not exist"});
             }
-            return res.status(201).json(existingPost);
+            return res.status(200).json(existingPost);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" });
