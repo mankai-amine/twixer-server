@@ -10,6 +10,7 @@ router.patch("/:postId", validateToken, controller.deletePost);
 router.get("/users/:username", controller.getUserPosts);
 router.get("/generalFeed", validateToken, controller.getGeneralFeed);
 router.get("/followFeed", validateToken, controller.getFollowFeed);
+router.get("/profilePage/:id", validateToken, controller.getProfilePage);
 
 
 module.exports = router;

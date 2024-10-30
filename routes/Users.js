@@ -7,6 +7,7 @@ const { validateToken } = require("../middlewares/AuthMiddleware");
 
 router.get("/", validateToken, controller.getUser);
 router.get("/:id", controller.getById);
+router.get("/username/:username", controller.getByUsername);
 router.post("/", controller.register);
 router.post("/login", controller.login);
 router.put("/update/:id", validateToken, controller.updateById);
