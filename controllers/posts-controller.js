@@ -149,6 +149,60 @@ module.exports = {
             res.status(500).json({message:" Internal server error"});
         }
     },
+    getProfilePage: async(req, res) => {
+        const { id } = req.params
+        console.log("Received ID:", id);
+
+        try {
+            const posts = await Post.findAll({
+                where: {
+                    user_id: id
+                },
+                attributes: {
+                    include: [
+                        [
+                            sequelize.fn('COUNT', sequelize.col('likes.id')),
+                            'likeCount'
+                        ]
+                    ]
+                },
+                include: [
+                    {
+                        model: User,
+                        as: 'poster',
+                        attributes: ['username']
+                    },
+                    {
+                        model: Like,
+                        as: 'likes',
+                        attributes: [],
+                    },
+                    {
+                        // might need to limit replies displayed for feed
+                        model: Reply,
+                        as: 'replies',
+                        attributes: ['content'],
+                        include: [
+                            {
+                                model: User,
+                                as: 'replier',
+                                attributes: ['username']
+                            }
+                        ]
+                    }
+                ],
+                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id']
+            });
+            if (posts.length === 0) {
+                return res.status(200).json({message:"There are no posts"});
+            }
+
+            return res.status(200).json(posts);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({message:" Internal server error"});
+        }
+    },
     getGeneralFeed: async(req, res) => {
         const threeDaysAgo = new Date();
         threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
@@ -183,7 +237,7 @@ module.exports = {
                         attributes: ['content'],
                         include: [
                             {
-                                modlel: User,
+                                model: User,
                                 attributes: ['username']
                             }
                         ]
@@ -247,7 +301,7 @@ module.exports = {
                         attributes: ['content'],
                         include: [
                             {
-                                modlel: User,
+                                model: User,
                                 attributes: ['username']
                             }
                         ]

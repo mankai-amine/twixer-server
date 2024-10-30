@@ -36,6 +36,20 @@ module.exports = {
             res.status(500).json({error:" Internal server error"});
         }
     },
+    getByUsername: async(req, res) => {
+        const { username } = req.params;
+
+        try{
+            const user = await User.findOne({where: { username }});
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }
+            res.status(200).json(user);
+        } catch (error){
+            console.error(error);
+            res.status(500).json({error:" Internal server error"});
+        }
+    },
     register: async(req, res) => {
         try{
             const user = req.body;
