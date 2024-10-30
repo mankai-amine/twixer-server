@@ -17,7 +17,6 @@ const generatePresignedUrl = async (req, res) => {
     Key: uniqueFileName,
     Expires: 60,
     ContentType: fileType || 'image/jpeg',
-    ACL: 'public-read',
   };
 
   try {
