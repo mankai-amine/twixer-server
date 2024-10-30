@@ -20,6 +20,9 @@ app.use("/api/follows", followRouter);
 const likeRouter = require('./routes/Likes');
 app.use("/api/likes", likeRouter);
 
+const uploadRouter = require('./routes/Uploads');
+app.use("/api/uploads", uploadRouter);
+
 const postRouter = require('./routes/Posts');
 app.use("/api/posts", postRouter);
 
