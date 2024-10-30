@@ -12,7 +12,7 @@ module.exports = {
                 attributes: {
                     include: [
                         [
-                            sequelize.fn('COUNT', sequelize.col('Likes.id')),
+                            sequelize.fn('COUNT', sequelize.col('likes.id')),
                             'likeCount'
                         ]
                     ]
@@ -20,18 +20,22 @@ module.exports = {
                 include: [
                     {
                         model: User,
+                        as: 'poster',
                         attributes: ['username']
                     },
                     {
                         model: Like,
+                        as: 'likes',
                         attributes: [],
                     },
                     {
                         model: Reply,
+                        as: 'replies',
                         attributes: ['content'],
                         include: [
                             {
                                 model: User,
+                                as: 'replier',
                                 attributes: ['username']
                             }
                         ]
@@ -43,7 +47,7 @@ module.exports = {
             if (existingPost === null) {
                 return res.status(400).json({ message: "Post does not exist"});
             }
-            return res.status(201).json(existingPost);
+            return res.status(200).json(existingPost);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal server error" });
