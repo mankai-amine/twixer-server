@@ -111,3 +111,32 @@
 - infinite scroll
 
 *****
+2024/10/30 Sean
+1. Done since last scrum
+- Various backend hotfixes
+- Account and login debug/setup, post to server
+2. Plan until next Scrum
+- Display posts on a page
+- Set up Heroku
+3. Need assistance / figure things out
+- Heroku
+
+2024/10/30 Amine
+1. Done since last scrum
+- user can update account settings (separate page for password)
+- work on profile page frontend
+2. Plan until next Scrum
+- finalize uplaoding images 
+- work on showing user personal page
+3. Need assistance / figure things out
+- relation between front end and S3
+
+2024/10/30 Michael
+1. Done since last scrum
+- Finished feed
+2. Plan until next Scrum
+- Admin views
+- Premium page view (no stripe for now)
+- Get posts showing up on the feed
+3. Need assistance / figure things out
+- tokens for logged in users
