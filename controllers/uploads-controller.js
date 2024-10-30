@@ -10,13 +10,13 @@ const s3 = new AWS.S3({
 
 const generatePresignedUrl = async (req, res) => {
   const { fileName, fileType } = req.body;
-  const uniqueFileName = `profile-pictures/${uuidv4()}-${fileName}`; // Adds UUID prefix
+  const uniqueFileName = `profile-pictures/${uuidv4()}-${fileName}.jpg`; // Adds UUID prefix
 
   const s3Params = {
     Bucket: process.env.AWS_BUCKET_NAME,
     Key: uniqueFileName,
     Expires: 60,
-    ContentType: fileType,
+    ContentType: fileType || 'image/jpeg',
     ACL: 'public-read',
   };
 
