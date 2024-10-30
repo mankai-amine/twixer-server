@@ -4,11 +4,11 @@ const { User, Post, Like, Reply, Follow, sequelize } = require("../models");
 module.exports = {
 
     getPost: async(req, res) => {
-        const { id } = req.params;
+        const { postId } = req.params;
 
         try {
             const existingPost = await Post.findOne({
-                where: {id: id},
+                where: {id: postId},
                 attributes: {
                     include: [
                         [
@@ -42,7 +42,8 @@ module.exports = {
                     }
                     // might need additional logic on reply later for nested replies.
                     // might also add more includes for things like reposting
-                ]
+                ],
+                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id']
             });
             if (existingPost === null) {
                 return res.status(400).json({ message: "Post does not exist"});
