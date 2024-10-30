@@ -193,9 +193,6 @@ module.exports = {
                 ],
                 group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id']
             });
-            if (posts.length === 0) {
-                return res.status(200).json({message:"There are no posts"});
-            }
 
             return res.status(200).json(posts);
         } catch (error) {
@@ -217,7 +214,7 @@ module.exports = {
                 attributes: {
                     include: [
                         [
-                            sequelize.fn('COUNT', sequelize.col('Likes.id')),
+                            sequelize.fn('COUNT', sequelize.col('likes.id')),
                             'likeCount'
                         ]
                     ]
@@ -281,7 +278,7 @@ module.exports = {
                 attributes: {
                     include: [
                         [
-                            sequelize.fn('COUNT', sequelize.col('Likes.id')),
+                            sequelize.fn('COUNT', sequelize.col('likes.id')),
                             'likeCount'
                         ]
                     ]
