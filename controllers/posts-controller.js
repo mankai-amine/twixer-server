@@ -46,7 +46,7 @@ module.exports = {
                 group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id']
             });
             if (existingPost === null) {
-                return res.status(400).json({ message: "Post does not exist"});
+                return res.status(400).json({ message: "Post doesn't exist"});
             }
             return res.status(200).json(existingPost);
         } catch (error) {
@@ -201,20 +201,32 @@ module.exports = {
         }
     },
     getGeneralFeed: async(req, res) => {
-        const threeDaysAgo = new Date();
-        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        let { page, limit } = req.query;
+        if (!page || isNaN(page) || !limit || isNaN(limit)) {
+            return res.status(400).json({ message: 'Invalid page or limit' });
+        }
+
+        page = parseInt(page, 10);
+        limit = parseInt(limit, 10);
+
+        const fiveDaysAgo = new Date();
+        fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
 
         try {
             const generalPosts = await Post.findAll({
                 where: {
                     date: {
-                        [Op.gte]: threeDaysAgo
+                        [Op.gte]: fiveDaysAgo,
                     }
                 },
+                subQuery: false,
+                limit,
+                offset: (page - 1) * limit,
                 attributes: {
                     include: [
-                        [
-                            sequelize.fn('COUNT', sequelize.col('likes.id')),
+                        [                        
+                            sequelize.literal('(SELECT COUNT(*) FROM likes WHERE likes.post_id = Post.id)'),
+                            //sequelize.fn('COUNT', sequelize.col('likes.id')),
                             'likeCount'
                         ]
                     ]
@@ -222,29 +234,31 @@ module.exports = {
                 include: [
                     {
                         model: User,
+                        as: 'poster',
                         attributes: ['username']
                     },
                     {
                         model: Like,
+                        as: 'likes',
                         attributes: [],
                     },
                     {
                         // might need to limit replies displayed for feed
                         model: Reply,
+                        as: 'replies',
                         attributes: ['content'],
                         include: [
                             {
                                 model: User,
+                                as: 'replier',
                                 attributes: ['username']
                             }
                         ]
                     }
                 ],
-                group: ['Post.id', 'User.id']
+                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id'],
+                order: [['date', 'DESC']]
             });
-            if (generalPosts === null) {
-                return res.status(200).json({message:"There are no recent posts"});
-            }
 
             return res.status(200).json(generalPosts);
         } catch (error) {
@@ -253,8 +267,17 @@ module.exports = {
         }
     },
     getFollowFeed: async(req, res) => {
-        const threeDaysAgo = new Date();
-        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        let { page, limit } = req.query;
+        if (!page || isNaN(page) || !limit || isNaN(limit)) {
+            return res.status(400).json({ message: 'Invalid page or limit' });
+        }
+
+        page = parseInt(page, 10);
+        limit = parseInt(limit, 10);
+
+        const fiveDaysAgo = new Date();
+        fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
         const currUserId = req.user.id;
 
         try {
@@ -262,9 +285,6 @@ module.exports = {
                 attributes: ['followee_id'],
                 where: {follower_id: currUserId},
             });
-            if (userFolloweeIds === null) {
-                return res.status(200).json({message:"User is not following anyone"});
-            }
 
             const postsByFollowees = await Post.findAll({
                 where: {
@@ -272,13 +292,14 @@ module.exports = {
                         [Op.in]: userFolloweeIds
                     },
                     date: {
-                        [Op.gte]: threeDaysAgo
+                        [Op.gte]: fiveDaysAgo
                     }
                 },
                 attributes: {
                     include: [
                         [
-                            sequelize.fn('COUNT', sequelize.col('likes.id')),
+                            //sequelize.fn('COUNT', sequelize.col('likes.id')),
+                            sequelize.literal('(SELECT COUNT(*) FROM likes WHERE likes.post_id = Post.id)'),
                             'likeCount'
                         ]
                     ]
@@ -286,29 +307,31 @@ module.exports = {
                 include: [
                     {
                         model: User,
+                        as: 'poster',
                         attributes: ['username']
                     },
                     {
                         model: Like,
+                        as: 'likes',
                         attributes: [],
                     },
                     {
                         // might need to limit replies displayed for feed
                         model: Reply,
+                        as: 'replies',
                         attributes: ['content'],
                         include: [
                             {
                                 model: User,
+                                as: 'replier',
                                 attributes: ['username']
                             }
                         ]
                     }
                 ],
-                group: ['Post.id', 'User.id']
+                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id'],
+                order: [['date', 'DESC']]
             });
-            if (postsByFollowees === null) {
-                return res.status(200).json({message:"Followees do not have any recent posts"});
-            }
 
             return res.status(200).json(postsByFollowees);
         } catch (error) {
