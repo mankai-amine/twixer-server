@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const cors = require('cors');  
 
+<<<<<<< HEAD
 app.use(cors({ origin: 'https://twixer-client-7fc12e0d4cd5.herokuapp.com/', credentials: true }));
 app.use(express.json());
 
