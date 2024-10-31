@@ -140,3 +140,35 @@
 - Get posts showing up on the feed
 3. Need assistance / figure things out
 - tokens for logged in users
+
+*****
+2024/10/31 Sean
+1. Done since last scrum
+- Helped with some parts of Heroku setup
+- Finished create post and single post on both ends
+2. Plan until next Scrum
+- Replies and Likes
+3. Need assistance / figure things out
+-
+
+2024/10/31 Amine
+1. Done since last scrum
+- finalize uplaoding images
+- user profile page
+2. Plan until next Scrum
+- finalize uplaoding images 
+- general feed and follower feed
+- user can follow and unfollow another user
+3. Need assistance / figure things out
+- 
+
+2024/10/31 Michael
+1. Done since last scrum
+- Set up heroku front and backend
+- nav bar routing
+2. Plan until next Scrum
+- Finish all Admin views
+- Premium page view (no stripe for now)
+- Adding like and comment buttons
+3. Need assistance / figure things out
+- tokens for logged in users
