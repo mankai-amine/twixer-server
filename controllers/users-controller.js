@@ -186,7 +186,7 @@ module.exports = {
                 return res.status(404).json({message:"User not found"});
             }
 
-            bannedUser.status = "banned";
+            bannedUser.account_status = "banned";
             await bannedUser.save(); 
 
             res.status(200).json(bannedUser);
