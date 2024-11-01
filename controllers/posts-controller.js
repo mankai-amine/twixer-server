@@ -284,17 +284,27 @@ module.exports = {
             const userFolloweeIds = await Follow.findAll({
                 attributes: ['followee_id'],
                 where: {follower_id: currUserId},
+                raw: true
             });
+
+            if (!userFolloweeIds.length) {
+                return res.status(200).json([]); 
+            }
+
+            const followeeIds = userFolloweeIds.map(follow => follow.followee_id);
 
             const postsByFollowees = await Post.findAll({
                 where: {
                     user_id: {
-                        [Op.in]: userFolloweeIds
+                        [Op.in]: followeeIds
                     },
                     date: {
                         [Op.gte]: fiveDaysAgo
                     }
                 },
+                subQuery: false,
+                limit,
+                offset: (page - 1) * limit,
                 attributes: {
                     include: [
                         [
@@ -320,6 +330,7 @@ module.exports = {
                         model: Reply,
                         as: 'replies',
                         attributes: ['content'],
+                        separate: true,
                         include: [
                             {
                                 model: User,
@@ -329,7 +340,7 @@ module.exports = {
                         ]
                     }
                 ],
-                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id'],
+                group: ['Post.id', 'poster.id'],
                 order: [['date', 'DESC']]
             });
 
