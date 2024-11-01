@@ -195,6 +195,29 @@ module.exports = {
             res.status(500).json({message:" Internal server error"});
         }
     },
+    unbanById: async (req, res) => {
+        try {
+            const currUser = req.user;
+            if (currUser.role !== "admin") {
+                return res.status(403).json({ message: "Request only possible for admins" });
+            }
+    
+            const unbannedUserId = req.params.id;
+    
+            const unbannedUser = await User.findByPk(unbannedUserId);
+            if (unbannedUser === null) {
+                return res.status(404).json({ message: "User not found" });
+            }
+    
+            unbannedUser.account_status = "active";  
+            await unbannedUser.save();
+    
+            res.status(200).json(unbannedUser);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    },
     getAllUsers: async (req, res) => {
         try {
             const users = await User.findAll();

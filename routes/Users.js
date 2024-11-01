@@ -12,7 +12,8 @@ router.post("/", controller.register);
 router.post("/login", controller.login);
 router.put("/update/:id", validateToken, controller.updateById);
 router.put("/password/:id", validateToken, controller.updatePassword);
-router.patch("/status/:id", validateToken, controller.banById);
+router.patch("/status/:id/ban", validateToken, controller.banById);
+router.patch("/status/:id/unban", validateToken, controller.unbanById);
 
 
 
