@@ -48,10 +48,33 @@ module.exports = {
             res.status(500).json({message:" Internal server error"});
         }
     },
+    getIsFollowing: async(req, res) => {
+        try{
+            const followerId  = req.user.id;
+            const { followeeId } = req.params;
+
+            const follow = await Follow.findOne({
+                where: {
+                    follower_id : followerId,
+                    followee_id: followeeId, 
+                }
+            })
+
+            if(follow){
+                return res.status(200).json({isFollowing: true});
+            } else{
+                return res.status(200).json({isFollowing: false});
+            }
+                
+        }   catch (error){
+            console.error(error);
+            return res.status(500).json({error:" Internal server error"});
+        }
+    },
     follow: async(req, res) => {
         try{
             const followerId = req.user.id;
-            const followeeId = req.body.followeeId;
+            const followeeId = req.params.followeeId;
 
             const follow = await Follow.findOne({
                 where: {
@@ -78,7 +101,7 @@ module.exports = {
     unfollow: async(req, res) => {
         try{
             const followerId = req.user.id;
-            const followeeId = req.body.followeeId;
+            const followeeId = req.params.followeeId;
 
             await Follow.destroy({
                 where: {
