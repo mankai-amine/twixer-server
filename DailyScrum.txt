@@ -156,7 +156,6 @@
 - finalize uplaoding images
 - user profile page
 2. Plan until next Scrum
-- finalize uplaoding images 
 - general feed and follower feed
 - user can follow and unfollow another user
 3. Need assistance / figure things out
@@ -172,3 +171,33 @@
 - Adding like and comment buttons
 3. Need assistance / figure things out
 - tokens for logged in users
+
+*****
+2024/11/01 Sean
+1. Done since last scrum
+- Set up Reply page and set it up inside of single post page
+2. Plan until next Scrum
+- Ensure replies are sent properly using form, style page
+3. Need assistance / figure things out
+-
+
+2024/11/01 Amine
+1. Done since last scrum
+- general feed and follower feed
+- user can follow and unfollow another user
+2. Plan until next Scrum
+- finalize uplaoding images 
+- Enable deleting posts
+- Work on Likes
+3. Need assistance / figure things out
+- 
+
+2024/11/01 Michael
+1. Done since last scrum
+- Styling and admin user list (for delete)
+2. Plan until next Scrum
+- Get the users to actually show up
+- Adding like and comment buttons
+- finish other admin views
+3. Need assistance / figure things out
+- Get the users to actually show up
