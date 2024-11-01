@@ -103,16 +103,16 @@ module.exports = {
         }
     },
     deletePost: async(req, res) => {
-        const currUser = req.user;
-        const { id } = req.params;
+        const user = req.user;
+        const { postId } = req.params;
 
         try {
-            const requestedPost = await Post.findByPk(id);
+            const requestedPost = await Post.findByPk(postId);
             if (requestedPost === null) {
                 return res.status(400).json({message:"Post not found"});
             }
 
-            if(parseInt(currUser.id, 10) !== parseInt(requestedPost.user_id, 10)){
+            if(parseInt(user.id, 10) !== parseInt(requestedPost.user_id, 10)){
                 return res.status(400).json({message:"Request not authorized"});
             }
 
@@ -156,7 +156,8 @@ module.exports = {
         try {
             const posts = await Post.findAll({
                 where: {
-                    user_id: id
+                    user_id: id,
+                    is_deleted: 0,
                 },
                 attributes: {
                     include: [
@@ -215,6 +216,7 @@ module.exports = {
         try {
             const generalPosts = await Post.findAll({
                 where: {
+                    is_deleted: 0,
                     date: {
                         [Op.gte]: fiveDaysAgo,
                     }
@@ -283,7 +285,9 @@ module.exports = {
         try {
             const userFolloweeIds = await Follow.findAll({
                 attributes: ['followee_id'],
-                where: {follower_id: currUserId},
+                where: {
+                    follower_id: currUserId,
+                },
                 raw: true
             });
 
@@ -295,6 +299,7 @@ module.exports = {
 
             const postsByFollowees = await Post.findAll({
                 where: {
+                    is_deleted: 0,
                     user_id: {
                         [Op.in]: followeeIds
                     },

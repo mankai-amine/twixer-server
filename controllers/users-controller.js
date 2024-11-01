@@ -175,7 +175,7 @@ module.exports = {
     banById: async(req, res) => {
         try{
             const currUser = req.user;
-            if(currUser.role !== "ADMIN"){
+            if(currUser.role !== "admin"){
                 return res.status(403).json({message:"Request only possible for admins"});
             }
 
