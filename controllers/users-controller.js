@@ -103,7 +103,7 @@ module.exports = {
             }
 
             const accessToken = sign(
-                { username: user.username, id: user.id}, 
+                { username: user.username, id: user.id, role:user.role}, 
                 process.env.JWT_SECRET
             );
             return res.status(200).json({ accessToken }); 
@@ -175,11 +175,11 @@ module.exports = {
     banById: async(req, res) => {
         try{
             const currUser = req.user;
-            if(currUser.role !== "ADMIN"){
+            if(currUser.role !== "admin"){
                 return res.status(403).json({message:"Request only possible for admins"});
             }
 
-            const { bannedUserId } = req.params;
+            const bannedUserId = req.params.id;
 
             const bannedUser = await User.findByPk(bannedUserId);
             if(bannedUser === null){
@@ -193,6 +193,15 @@ module.exports = {
         } catch (error){
             console.error(error);
             res.status(500).json({message:" Internal server error"});
+        }
+    },
+    getAllUsers: async (req, res) => {
+        try {
+            const users = await User.findAll();
+            res.status(200).json(users);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal server error' });
         }
     }
 }
