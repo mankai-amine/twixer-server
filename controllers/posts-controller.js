@@ -112,7 +112,7 @@ module.exports = {
                 return res.status(400).json({message:"Post not found"});
             }
 
-            if(parseInt(user.id, 10) !== parseInt(requestedPost.user_id, 10)){
+            if( user.role!="admin" && ( parseInt(user.id, 10) !== parseInt(requestedPost.user_id, 10) ) ){
                 return res.status(400).json({message:"Request not authorized"});
             }
 
