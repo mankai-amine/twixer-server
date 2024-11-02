@@ -3,16 +3,22 @@ const { Like } = require("../models");
 
 module.exports = {
 
-    getPostLikes: async(req, res) => {
-        const postId = req.body.postId;
+    getIsPostLiked: async(req, res) => {
+        const postId = req.params.postId;
+        const user = req.user;
 
         try{
-            const listOfPostLikes = await Like.findAll({
+            const isLiked = await Like.findOne({
                 where: {
-                    post_id: postId 
+                    post_id: postId,
+                    user_id: user.id 
                 }
             });
-            res.status(200).json(listOfPostLikes);
+            if(isLiked){
+                res.status(200).json({isPostLiked:true});
+            } else{
+                res.status(200).json({isPostLiked:false});
+            }
         } catch (error){
             console.error(error);
             res.status(500).json({message:" Internal server error"});
@@ -36,11 +42,23 @@ module.exports = {
     likePost: async(req, res) => {
         try{
             const userId = req.user.id;
-            const postId = req.body.postId;
+            const postId = req.params.postId;
+
+            const existingLike = await Like.findOne({
+                where: {
+                    user_id: userId,
+                    post_id: postId,
+                },
+            });
+            
+            if (existingLike) {
+                return res.status(400).json({ error: "You have already liked this post." });
+            }            
 
             await Like.create({
                 user_id : userId,
                 post_id : postId,
+                reply_id: null,
             });
                 
             return res.status(201).json({message: "Like has been added successfully"});
@@ -68,7 +86,18 @@ module.exports = {
     unlikePost: async(req, res) => {
         try{
             const userId = req.user.id;
-            const postId = req.body.postId;
+            const postId = req.params.postId;
+
+            const existingLike = await Like.findOne({
+                where: {
+                    user_id: userId,
+                    post_id: postId,
+                },
+            });
+            
+            if (!existingLike) {
+                return res.status(400).json({ error: "You didn't like this post anyways." });
+            }  
 
             await Like.destroy({
                 where: {

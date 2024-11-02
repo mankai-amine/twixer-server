@@ -5,7 +5,7 @@ const { validateToken } = require("../middlewares/AuthMiddleware");
 
 
 
-router.get("/:postId", controller.getPostLikes);
+router.get("/isLiked/:postId", validateToken, controller.getIsPostLiked);
 router.get("/:replyId", controller.getReplyLikes);
 
 router.post("/:postId", validateToken, controller.likePost);
