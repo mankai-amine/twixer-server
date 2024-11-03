@@ -409,6 +409,14 @@ module.exports = {
                             //sequelize.fn('COUNT', sequelize.col('likes.id')),
                             sequelize.literal('(SELECT COUNT(*) FROM likes WHERE likes.post_id = Post.id)'),
                             'likeCount'
+                        ],
+                        [
+                            sequelize.literal(`(
+                                SELECT COUNT(DISTINCT reposts.id)
+                                FROM posts AS reposts
+                                WHERE reposts.orig_post_id = Post.id
+                            )`),
+                            'repostCount'
                         ]
                     ]
                 },
