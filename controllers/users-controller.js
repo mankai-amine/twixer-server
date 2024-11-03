@@ -91,7 +91,7 @@ module.exports = {
                 return res.status(404).json({ error: "User doesn't exist" }); // 404 Not Found
             } 
 
-            if(user.status == "banned"){
+            if(user.account_status == "banned"){
                 return res.status(400).json({ error: "You have been banned" }); 
 
             }
