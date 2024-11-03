@@ -69,10 +69,10 @@ module.exports = {
     },
     deleteReply: async(req, res) => {
         const currUser = req.user;
-        const { id } = req.params;
+        const { replyId } = req.params;
 
         try {
-            const requestedReply = await Reply.findByPk(id);
+            const requestedReply = await Reply.findByPk(replyId);
             if (requestedReply === null) {
                 return res.status(400).json({message:"Reply not found"});
             }
@@ -82,10 +82,10 @@ module.exports = {
             }
 
             requestedReply.content = "This reply was deleted";
-            requestedReply.isDeleted = true;
+            requestedReply.is_deleted = true;
             requestedReply.save();
 
-            return res.status(200).json(requestedPost);
+            return res.status(200).json(requestedReply);
 
         } catch (error) {
             console.error(error);
