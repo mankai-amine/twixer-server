@@ -14,6 +14,10 @@ module.exports = {
                         [
                             sequelize.fn('COUNT', sequelize.col('likes.id')),
                             'likeCount'
+                        ],
+                        [
+                            sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('reposts.id'))), // Use DISTINCT to avoid duplicates
+                            'repostCount'
                         ]
                     ]
                 },
@@ -39,11 +43,23 @@ module.exports = {
                                 attributes: ['username']
                             }
                         ]
+                    },
+                    {
+                        model: Post,
+                        as: 'reposts',
+                        attributes: ['id', 'date'],
+                        include: [
+                            {
+                                model: User,
+                                as: 'poster',
+                                attributes: ['username']
+                            }
+                        ]
                     }
                     // might need additional logic on reply later for nested replies.
                     // might also add more includes for things like reposting
                 ],
-                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id']
+                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id', 'reposts.id', 'reposts->poster.id']
             });
             if (existingPost === null) {
                 return res.status(400).json({ message: "Post doesn't exist"});
@@ -353,6 +369,85 @@ module.exports = {
         } catch (error) {
             console.error(error);
             res.status(500).json({message:" Internal server error"});
+        }
+    },
+    getIsReposted: async(req, res) => {
+        const postId = req.params.postId;
+        const user = req.user;
+
+        try{
+            const isReposted = await Post.findOne({
+                where: {
+                    orig_post_id: postId,
+                    user_id: user.id 
+                }
+            });
+            if(isReposted){
+                res.status(200).json({isReposted:true});
+            } else{
+                res.status(200).json({isReposted:false});
+            }
+        } catch (error){
+            console.error(error);
+            res.status(500).json({message:" Internal server error"});
+        }
+    },
+    addRepost: async(req, res) => {
+        try{
+            const userId = req.user.id;
+            const postId = req.params.postId;
+            const content = req.body.content
+
+            const existingRepost = await Post.findOne({
+                where: {
+                    user_id: userId,
+                    orig_post_id: postId,
+                },
+            });
+            
+            if (existingRepost) {
+                return res.status(400).json({ error: "You have already reposted this post." });
+            }            
+
+            await Post.create({
+                user_id : userId,
+                orig_post_id: postId,
+                content: content
+            });
+                
+            return res.status(201).json({message: "Repost has been added successfully"});
+        }   catch (error){
+            console.error(error);
+            return res.status(500).json({error:" Internal server error"});
+        }
+    },
+    removeRepost: async(req, res) => {
+        try{
+            const userId = req.user.id;
+            const postId = req.params.postId;
+
+            const existingRepost = await Post.findOne({
+                where: {
+                    user_id: userId,
+                    orig_post_id: postId,
+                },
+            });
+            
+            if (!existingRepost) {
+                return res.status(400).json({ error: "You didn't repost this post anyways." });
+            }  
+
+            await Post.destroy({
+                where: {
+                    user_id : userId,
+                    orig_post_id : postId,
+                }  
+            });
+                
+            return res.status(200).json({message: "Repost has been removed successfully"});
+        }   catch (error){
+            console.error(error);
+            return res.status(500).json({error:" Internal server error"});
         }
     }
 
