@@ -77,7 +77,7 @@ module.exports = {
                 reply_id : replyId,
             });
                 
-            return res.status(201).json({message: "Reply has been added successfully"});
+            return res.status(201).json({message: "Reply has been liked successfully"});
         }   catch (error){
             console.error(error);
             return res.status(500).json({error:" Internal server error"});
