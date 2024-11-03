@@ -28,6 +28,17 @@ module.exports = {
                         attributes: ['username']
                     },
                     {
+                        model: Post,
+                        as: 'originalPost',
+                        include: [
+                            {
+                                model: User,
+                                as: 'poster',
+                                attributes: ['username'],
+                            }
+                        ]
+                    },
+                    {
                         model: Like,
                         as: 'likes',
                         attributes: [],
@@ -59,7 +70,8 @@ module.exports = {
                     // might need additional logic on reply later for nested replies.
                     // might also add more includes for things like reposting
                 ],
-                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id', 'reposts.id', 'reposts->poster.id']
+                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id', 'reposts.id', 'reposts->poster.id', 'originalPost.id',
+                    'originalPost->poster.id']
             });
             if (existingPost === null) {
                 return res.status(400).json({ message: "Post doesn't exist"});
@@ -180,6 +192,14 @@ module.exports = {
                         [
                             sequelize.fn('COUNT', sequelize.col('likes.id')),
                             'likeCount'
+                        ],
+                        [
+                            sequelize.literal(`(
+                                SELECT COUNT(DISTINCT reposts.id)
+                                FROM posts AS reposts
+                                WHERE reposts.orig_post_id = Post.id
+                            )`),
+                            'repostCount'
                         ]
                     ]
                 },
@@ -188,6 +208,17 @@ module.exports = {
                         model: User,
                         as: 'poster',
                         attributes: ['username']
+                    },
+                    {
+                        model: Post,
+                        as: 'originalPost',
+                        include: [
+                            {
+                                model: User,
+                                as: 'poster',
+                                attributes: ['username'],
+                            }
+                        ]
                     },
                     {
                         model: Like,
@@ -206,9 +237,24 @@ module.exports = {
                                 attributes: ['username']
                             }
                         ]
+                    },
+                    {
+                        model: Post,
+                        as: 'reposts',
+                        attributes: ['id', 'date'],
+                        include: [
+                            {
+                                model: User,
+                                as: 'poster',
+                                attributes: ['username']
+                            }
+                        ]
                     }
+
                 ],
-                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id']
+                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id', 'reposts.id', 'reposts->poster.id',  'originalPost.id',
+                    'originalPost->poster.id'],
+                order: [['date', 'DESC']]
             });
 
             return res.status(200).json(posts);
@@ -244,8 +290,15 @@ module.exports = {
                     include: [
                         [                        
                             sequelize.literal('(SELECT COUNT(*) FROM likes WHERE likes.post_id = Post.id)'),
-                            //sequelize.fn('COUNT', sequelize.col('likes.id')),
                             'likeCount'
+                        ],
+                        [
+                            sequelize.literal(`(
+                                SELECT COUNT(DISTINCT reposts.id)
+                                FROM posts AS reposts
+                                WHERE reposts.orig_post_id = Post.id
+                            )`),
+                            'repostCount'
                         ]
                     ]
                 },
@@ -254,6 +307,17 @@ module.exports = {
                         model: User,
                         as: 'poster',
                         attributes: ['username']
+                    },
+                    {
+                        model: Post,
+                        as: 'originalPost',
+                        include: [
+                            {
+                                model: User,
+                                as: 'poster',
+                                attributes: ['username'],
+                            }
+                        ]
                     },
                     {
                         model: Like,
@@ -272,9 +336,22 @@ module.exports = {
                                 attributes: ['username']
                             }
                         ]
+                    },
+                    {
+                        model: Post,
+                        as: 'reposts',
+                        attributes: ['id', 'date'],
+                        include: [
+                            {
+                                model: User,
+                                as: 'poster',
+                                attributes: ['username']
+                            }
+                        ]
                     }
                 ],
-                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id'],
+                group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id', 'reposts.id', 'reposts->poster.id',  'originalPost.id',
+                    'originalPost->poster.id'],
                 order: [['date', 'DESC']]
             });
 
@@ -342,6 +419,17 @@ module.exports = {
                         attributes: ['username']
                     },
                     {
+                        model: Post,
+                        as: 'originalPost',
+                        include: [
+                            {
+                                model: User,
+                                as: 'poster',
+                                attributes: ['username'],
+                            }
+                        ]
+                    },
+                    {
                         model: Like,
                         as: 'likes',
                         attributes: [],
@@ -361,7 +449,7 @@ module.exports = {
                         ]
                     }
                 ],
-                group: ['Post.id', 'poster.id'],
+                group: ['Post.id', 'poster.id',  'originalPost.id', 'originalPost->poster.id'],
                 order: [['date', 'DESC']]
             });
 
