@@ -91,7 +91,7 @@ module.exports = {
                 return res.status(404).json({ error: "User doesn't exist" }); // 404 Not Found
             } 
 
-            if(user.status == "banned"){
+            if(user.account_status == "banned"){
                 return res.status(400).json({ error: "You have been banned" }); 
 
             }
@@ -172,6 +172,32 @@ module.exports = {
             res.status(500).json({message:" Internal server error"});
         }
     },
+    updateRole: async (req, res) => {
+        const currUser = req.user;
+        const { id } = req.params;
+        const { role } = req.body;
+    
+        try {
+            // Check if the current user is an admin
+            if (currUser.role !== 'admin') {
+                return res.status(403).json({ message: "Only admins can update roles" });
+            }
+    
+            const user = await User.findByPk(id);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+    
+            // Update the user's role
+            user.role = role;
+            await user.save();
+    
+            res.status(200).json({ message: "Role updated successfully", user });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    },
     banById: async(req, res) => {
         try{
             const currUser = req.user;
@@ -220,8 +246,27 @@ module.exports = {
     },
     getAllUsers: async (req, res) => {
         try {
-            const users = await User.findAll();
-            res.status(200).json(users);
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            const offset = (page - 1) * limit;
+    
+            const { count, rows } = await User.findAndCountAll({
+                limit: limit,
+                offset: offset,
+                order: [['id', 'ASC']], // You can modify the ordering as needed
+            });
+    
+            const totalPages = Math.ceil(count / limit);
+    
+            res.status(200).json({
+                data: rows,
+                pagination: {
+                    totalCount: count,
+                    totalPages: totalPages,
+                    currentPage: page,
+                    pageSize: limit
+                }
+            });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal server error' });
