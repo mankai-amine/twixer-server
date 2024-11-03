@@ -186,7 +186,6 @@
 - general feed and follower feed
 - user can follow and unfollow another user
 2. Plan until next Scrum
-- finalize uplaoding images 
 - Enable deleting posts
 - Work on Likes
 3. Need assistance / figure things out
@@ -201,3 +200,36 @@
 - finish other admin views
 3. Need assistance / figure things out
 - Get the users to actually show up
+
+*****
+2024/11/03 Sean
+1. Done since last scrum
+- Set up more reply functionality and ui(username, likecount, delete button)
+2. Plan until next Scrum
+- Ensure replies look good and can be deleted/liked
+- Any other spot work that needs to be handled
+3. Need assistance / figure things out
+-
+
+2024/11/03 Amine
+1. Done since last scrum
+- Set up deleting posts
+- Set up liking and unliking posts
+2. Plan until next Scrum
+- Set up repost
+3. Need assistance / figure things out
+- 
+
+2024/11/03 Michael
+1. Done since last scrum
+- Get the users to actually show up
+- Banning and unbanning users (admin)
+- Started work on getting profile picture to show up in feed
+2. Plan until next Scrum
+- Finish profile picture in feed
+- Role selection in admin user list
+- Cleaning up CSS for login, register and createpost 
+- Start presentation work
+3. Need assistance / figure things out
+- (Maybe) profile picture
+
