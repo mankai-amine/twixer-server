@@ -245,9 +245,36 @@ module.exports = {
         }
     },
     getAllUsers: async (req, res) => {
+        // try {
+        //     const users = await User.findAll();
+        //     res.status(200).json(users);
+        // } catch (error) {
+        //     console.error(error);
+        //     res.status(500).json({ error: 'Internal server error' });
+        // }
+
         try {
-            const users = await User.findAll();
-            res.status(200).json(users);
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            const offset = (page - 1) * limit;
+    
+            const { count, rows } = await User.findAndCountAll({
+                limit: limit,
+                offset: offset,
+                order: [['id', 'ASC']], // You can modify the ordering as needed
+            });
+    
+            const totalPages = Math.ceil(count / limit);
+    
+            res.status(200).json({
+                data: rows,
+                pagination: {
+                    totalCount: count,
+                    totalPages: totalPages,
+                    currentPage: page,
+                    pageSize: limit
+                }
+            });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal server error' });
