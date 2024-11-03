@@ -172,6 +172,32 @@ module.exports = {
             res.status(500).json({message:" Internal server error"});
         }
     },
+    updateRole: async (req, res) => {
+        const currUser = req.user;
+        const { id } = req.params;
+        const { role } = req.body;
+    
+        try {
+            // Check if the current user is an admin
+            if (currUser.role !== 'admin') {
+                return res.status(403).json({ message: "Only admins can update roles" });
+            }
+    
+            const user = await User.findByPk(id);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+    
+            // Update the user's role
+            user.role = role;
+            await user.save();
+    
+            res.status(200).json({ message: "Role updated successfully", user });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    },
     banById: async(req, res) => {
         try{
             const currUser = req.user;
