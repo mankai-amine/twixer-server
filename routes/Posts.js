@@ -11,6 +11,9 @@ router.get("/generalFeed", validateToken, controller.getGeneralFeed);
 router.get("/followFeed", validateToken, controller.getFollowFeed);
 router.get("/profilePage/:id", validateToken, controller.getProfilePage);
 router.get("/:postId", controller.getPost);
+router.get("/isReposted/:postId", validateToken, controller.getIsReposted);
+router.post("/reposts/:postId", validateToken, controller.addRepost);
+router.delete("/reposts/:postId", validateToken, controller.removeRepost);
 
 
 module.exports = router;
