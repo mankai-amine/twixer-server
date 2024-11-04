@@ -347,6 +347,10 @@ module.exports = {
                         model: Reply,
                         as: 'replies',
                         attributes: ['content'],
+                        where: {
+                            is_deleted: 0
+                        },
+                        required: false,
                         separate: true,
                         include: [
                             {
