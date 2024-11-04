@@ -492,7 +492,7 @@ module.exports = {
         try{
             const userId = req.user.id;
             const postId = req.params.postId;
-            const content = req.body.content
+            //const content = req.body.content
 
             const existingRepost = await Post.findOne({
                 where: {
@@ -505,10 +505,12 @@ module.exports = {
                 return res.status(400).json({ error: "You have already reposted this post." });
             }            
 
+            const post = await Post.findByPk(postId);
+
             await Post.create({
                 user_id : userId,
                 orig_post_id: postId,
-                content: content
+                content: post.content
             });
                 
             return res.status(201).json({message: "Repost has been added successfully"});
