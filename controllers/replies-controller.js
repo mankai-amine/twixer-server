@@ -98,9 +98,9 @@ module.exports = {
     async function isReplyValid(content, req, res){
         const pattern1 = /^[a-zA-Z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/;
     
-        if(content.length > 280 || content.length < 5){
+        if(content.length > 280 || content.length < 1){
             res.status(400).send({
-                error: "Reply must contain between 5 and 280 characters."
+                error: "Reply must contain between 1 and 280 characters."
             })
             return false;
         }
@@ -125,9 +125,9 @@ module.exports = {
             return false;
         }
 
-        if(content.length > 280 || content.length < 5){
+        if(content.length > 280 || content.length < 1 ){
             res.status(400).send({
-                error: "Reply must contain between 5 and 280 characters"
+                error: "Reply must contain between 1 and 280 characters"
             })
             return false;
         }
