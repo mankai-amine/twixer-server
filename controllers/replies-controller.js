@@ -73,17 +73,17 @@ module.exports = {
 
         try {
             const requestedReply = await Reply.findByPk(replyId);
-            if (requestedReply === null) {
+            if (!requestedReply) {
                 return res.status(400).json({message:"Reply not found"});
             }
 
-            if(parseInt(currUser.id, 10) !== parseInt(requestedReply.user_id, 10)){
-                return res.status(400).json({message:"Request not authorized"});
+            if(currUser.role!="admin" && (parseInt(currUser.id, 10) !== parseInt(requestedReply.user_id, 10))){
+                return res.status(403).json({message:"Request not authorized"});
             }
 
             requestedReply.content = "This reply was deleted";
             requestedReply.is_deleted = true;
-            requestedReply.save();
+            await requestedReply.save();
 
             return res.status(200).json(requestedReply);
 
