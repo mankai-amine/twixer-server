@@ -94,7 +94,7 @@ module.exports = {
     }
 }
 
-    // helper function
+    // helper functions
     async function isReplyValid(content, req, res){
         const pattern1 = /^[a-zA-Z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/;
     

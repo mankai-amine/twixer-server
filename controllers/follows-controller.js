@@ -4,7 +4,7 @@ module.exports = {
 
     getFollowers: async(req, res) => {
         const { followeeId } = req.params;
-        console.log("Received id:", followeeId); // Debugging line
+        console.log("Received id:", followeeId); 
 
         try{
             const listOfFollowers = await Follow.findAll({
@@ -27,7 +27,7 @@ module.exports = {
     },
     getFollowing: async(req, res) => {
         const { followerId } = req.params;
-        console.log("Received id:", followerId); // Debugging line
+        console.log("Received id:", followerId); 
 
         try{
             const listOfFollowing = await Follow.findAll({

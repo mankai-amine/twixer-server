@@ -16,7 +16,8 @@ module.exports = {
                             'likeCount'
                         ],
                         [
-                            sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('reposts.id'))), // Use DISTINCT to avoid duplicates
+                            // Use DISTINCT to avoid duplicates
+                            sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('reposts.id'))), 
                             'repostCount'
                         ]
                     ]
@@ -71,8 +72,6 @@ module.exports = {
                             }
                         ]
                     }
-                    // might need additional logic on reply later for nested replies.
-                    // might also add more includes for things like reposting
                 ],
                 group: ['Post.id', 'poster.id', 'replies.id', 'replies->replier.id', 'reposts.id', 'reposts->poster.id', 'originalPost.id',
                     'originalPost->poster.id']
@@ -230,7 +229,6 @@ module.exports = {
                         attributes: [],
                     },
                     {
-                        // might need to limit replies displayed for feed
                         model: Reply,
                         as: 'replies',
                         attributes: ['content'],
@@ -333,7 +331,6 @@ module.exports = {
                         attributes: [],
                     },
                     {
-                        // might need to limit replies displayed for feed
                         model: Reply,
                         as: 'replies',
                         attributes: ['content'],
@@ -418,7 +415,6 @@ module.exports = {
                 attributes: {
                     include: [
                         [
-                            //sequelize.fn('COUNT', sequelize.col('likes.id')),
                             sequelize.literal('(SELECT COUNT(*) FROM likes WHERE likes.post_id = Post.id)'),
                             'likeCount'
                         ],
@@ -455,7 +451,6 @@ module.exports = {
                         attributes: [],
                     },
                     {
-                        // might need to limit replies displayed for feed
                         model: Reply,
                         as: 'replies',
                         attributes: ['content'],
@@ -508,7 +503,6 @@ module.exports = {
         try{
             const userId = req.user.id;
             const postId = req.params.postId;
-            //const content = req.body.content
 
             const existingRepost = await Post.findOne({
                 where: {
@@ -567,7 +561,7 @@ module.exports = {
 
 }
 
-    // helper function
+    // helper functions
     async function isPostValid(content, currUser, req, res){
         const pattern1 = /^[a-zA-Z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/;
     

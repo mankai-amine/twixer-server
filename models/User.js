@@ -50,8 +50,8 @@ module.exports = (sequelize, DataTypes) => {
 
     User.associate = (models) => {
         User.hasMany(models.Post, {
-            foreignKey: 'user_id',  // Foreign key in Post model
-            as: 'posts'             // Alias for including posts
+            foreignKey: 'user_id',  
+            as: 'posts'             
         });
 
         User.hasMany(models.Reply, {

@@ -4,12 +4,10 @@ const bcrypt = require('bcrypt');
 const {sign} = require("jsonwebtoken")
 
 module.exports = {
-    /* Inside this function, we use req.user, which is expected to contain the authenticated user's information. 
-    This is populated by middleware that verifies the accessToken from the incoming request headers.*/
+    
     getUser: async(req, res) => {
-
         try {
-        const userId = req.user.id; // req.user contains the id from the token
+        const userId = req.user.id; 
         const user = await User.findByPk(userId); 
 
         if (!user) {
@@ -88,7 +86,7 @@ module.exports = {
             const user = await User.findOne({ where: { username: username}});
 
             if(!user){
-                return res.status(404).json({ error: "User doesn't exist" }); // 404 Not Found
+                return res.status(404).json({ error: "User doesn't exist" }); 
             } 
 
             if(user.account_status == "banned"){
@@ -99,7 +97,7 @@ module.exports = {
             const match = await bcrypt.compare(password, user.password);
 
             if (!match) {
-                return res.status(400).json({ error: "Wrong password" }); // 400 Bad Request
+                return res.status(400).json({ error: "Wrong password" }); 
             }
 
             const accessToken = sign(
@@ -109,7 +107,7 @@ module.exports = {
             return res.status(200).json({ accessToken }); 
         } catch (error){
             console.error(error);
-            return res.status(500).json({error:" Internal server error"}); // 500 Internal Server Error
+            return res.status(500).json({error:" Internal server error"}); 
         }
     },
     updateById: async(req, res) => {
@@ -133,7 +131,7 @@ module.exports = {
 
             const updatedUser = await requestedUser.update({
                 ...userDetails,
-                password: requestedUser.password,   // a separate API call is dedicated to udpate password
+                password: requestedUser.password,   
             });
     
             res.status(200).json(updatedUser);
@@ -178,7 +176,6 @@ module.exports = {
         const { role } = req.body;
     
         try {
-            // Check if the current user is an admin
             if (currUser.role !== 'admin') {
                 return res.status(403).json({ message: "Only admins can update roles" });
             }
@@ -188,7 +185,6 @@ module.exports = {
                 return res.status(404).json({ message: "User not found" });
             }
     
-            // Update the user's role
             user.role = role;
             await user.save();
     
@@ -253,7 +249,7 @@ module.exports = {
             const { count, rows } = await User.findAndCountAll({
                 limit: limit,
                 offset: offset,
-                order: [['id', 'ASC']], // You can modify the ordering as needed
+                order: [['id', 'ASC']], 
             });
     
             const totalPages = Math.ceil(count / limit);
